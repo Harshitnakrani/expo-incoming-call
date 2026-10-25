@@ -143,6 +143,28 @@ export default function App() {
 
 ---
 
+### 4. Android 14+ Permission Check & Heads-Up Fallback
+
+On Android 14 (API 34), Google restricts `USE_FULL_SCREEN_INTENT` by default unless granted or qualified under Google Play's Calling/Alarm policy.
+
+`expo-incoming-call` handles this out of the box:
+- **Permission Granted**: Wakes screen and launches the full-screen lockscreen takeover.
+- **Permission Denied / Revoked**: Automatically falls back to a high-priority Heads-Up notification banner with interactive **Accept** and **Decline** action buttons.
+
+You can also check the permission status at runtime and deep-link users directly to the settings page:
+
+```tsx
+import { canUseFullScreenIntent, openFullScreenIntentSettings } from 'expo-incoming-call';
+
+const isAllowed = canUseFullScreenIntent();
+if (!isAllowed) {
+  // Opens Android's system settings to grant Full Screen Intent access
+  openFullScreenIntentSettings();
+}
+```
+
+---
+
 ## 🔔 Waking Killed Apps from FCM (Firebase Cloud Messaging)
 
 To wake an Android device from a killed state, your server **must send a high-priority data-only message** (do NOT include a top-level `notification` key in the FCM payload, as the Android system tray will intercept it):

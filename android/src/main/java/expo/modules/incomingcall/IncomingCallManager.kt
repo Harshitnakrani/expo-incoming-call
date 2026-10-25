@@ -18,6 +18,7 @@ import android.os.PowerManager
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.net.Uri
 import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -143,7 +144,9 @@ object IncomingCallManager {
         }
       }
 
-      // 4. Build notification with FullScreenIntent
+      // 4. Build notification (with FullScreenIntent or fallback Heads-Up)
+      val canUseFSI = canUseFullScreenIntent(context)
+
       val notificationBuilder = NotificationCompat.Builder(context, channelId)
         .setSmallIcon(context.applicationInfo.icon)
         .setContentTitle(callerName)
@@ -153,17 +156,40 @@ object IncomingCallManager {
         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         .setOngoing(true)
         .setAutoCancel(false)
-        .setFullScreenIntent(fullScreenPendingIntent, true)
         .setContentIntent(fullScreenPendingIntent)
+
+      if (canUseFSI) {
+        notificationBuilder.setFullScreenIntent(fullScreenPendingIntent, true)
+      } else {
+        Log.i(TAG, "USE_FULL_SCREEN_INTENT not granted; falling back to heads-up notification with action buttons")
+        val declineIntent = Intent(context, IncomingCallReceiver::class.java).apply {
+          action = IncomingCallReceiver.ACTION_CALL_DECLINE
+        }
+        val declinePendingIntent = PendingIntent.getBroadcast(
+          context, 20002, declineIntent, pendingIntentFlags
+        )
+        notificationBuilder.addAction(
+          android.R.drawable.ic_menu_close_clear_cancel,
+          "Decline",
+          declinePendingIntent
+        )
+        notificationBuilder.addAction(
+          android.R.drawable.ic_menu_call,
+          "Accept",
+          fullScreenPendingIntent
+        )
+      }
 
       val notification = notificationBuilder.build()
       notificationManager.notify(20001, notification)
 
-      // 5. Also launch Activity directly for guaranteed immediate foreground takeover
-      try {
-        context.startActivity(callIntent)
-      } catch (e: Exception) {
-        Log.w(TAG, "Direct startActivity fallback: ${e.message}")
+      // 5. If full screen is allowed, also launch Activity directly for immediate takeover
+      if (canUseFSI) {
+        try {
+          context.startActivity(callIntent)
+        } catch (e: Exception) {
+          Log.w(TAG, "Direct startActivity fallback: ${e.message}")
+        }
       }
 
       return true
@@ -318,6 +344,37 @@ object IncomingCallManager {
     activeActivity = null
     currentCallData = null
     return true
+  }
+
+  fun canUseFullScreenIntent(context: Context): Boolean {
+    if (Build.VERSION.SDK_INT >= 34) {
+      val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+      return nm?.canUseFullScreenIntent() ?: true
+    }
+    return true
+  }
+
+  fun openFullScreenIntentSettings(context: Context): Boolean {
+    if (Build.VERSION.SDK_INT >= 34) {
+      try {
+        val intent = Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT).apply {
+          data = Uri.parse("package:${context.packageName}")
+          flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        context.startActivity(intent)
+        return true
+      } catch (_: Exception) {
+        try {
+          val fallback = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+          }
+          context.startActivity(fallback)
+          return true
+        } catch (_: Exception) {}
+      }
+    }
+    return false
   }
 
   private fun dismissNotification(context: Context) {

@@ -1,6 +1,6 @@
 {
   "name": "expo-incoming-call",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Full-screen incoming call UI and lock screen takeover for Expo apps on Android",
   "main": "build/index.js",
   "types": "build/index.d.ts",

@@ -56,6 +56,22 @@ export function clearPendingAnsweredCall(): boolean {
 }
 
 /**
+ * Checks if the app currently has permission to display full-screen intents on Android 14+ (API 34).
+ * Always returns true on Android 13 and below.
+ */
+export function canUseFullScreenIntent(): boolean {
+  return ExpoIncomingCall.canUseFullScreenIntent();
+}
+
+/**
+ * Opens Android's system settings page (ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT)
+ * allowing the user to grant or toggle the Full Screen Intent permission on Android 14+.
+ */
+export function openFullScreenIntentSettings(): boolean {
+  return ExpoIncomingCall.openFullScreenIntentSettings();
+}
+
+/**
  * Add a listener for when the user taps "Accept".
  */
 export function addCallAnsweredListener(

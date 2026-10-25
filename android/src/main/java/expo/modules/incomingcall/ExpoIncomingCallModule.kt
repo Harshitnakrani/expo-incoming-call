@@ -78,5 +78,15 @@ class ExpoIncomingCallModule : Module() {
       IncomingCallManager.pendingAnsweredCall = null
       return@Function true
     }
+
+    Function("canUseFullScreenIntent") {
+      val context = appContext.reactContext ?: appContext.currentActivity ?: return@Function true
+      return@Function IncomingCallManager.canUseFullScreenIntent(context)
+    }
+
+    Function("openFullScreenIntentSettings") {
+      val context = appContext.reactContext ?: appContext.currentActivity ?: return@Function false
+      return@Function IncomingCallManager.openFullScreenIntentSettings(context)
+    }
   }
 }
