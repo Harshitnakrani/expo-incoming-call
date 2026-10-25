@@ -1,0 +1,42 @@
+{
+  "name": "expo-incoming-call",
+  "version": "0.1.0",
+  "description": "Full-screen incoming call UI and lock screen takeover for Expo apps on Android",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build": "tsc -p .",
+    "clean": "rimraf build",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "react-native",
+    "expo",
+    "expo-module",
+    "incoming-call",
+    "full-screen-intent",
+    "voip",
+    "lockscreen",
+    "callkeep",
+    "webrtc"
+  ],
+  "author": "Harshit Nakrani",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Harshitnakrani/expo-incoming-call.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Harshitnakrani/expo-incoming-call/issues"
+  },
+  "homepage": "https://github.com/Harshitnakrani/expo-incoming-call#readme",
+  "peerDependencies": {
+    "expo": "*",
+    "expo-modules-core": "*"
+  },
+  "devDependencies": {
+    "@expo/config-plugins": "^8.0.0",
+    "expo-modules-core": "*",
+    "typescript": "~5.3.3"
+  }
+}
