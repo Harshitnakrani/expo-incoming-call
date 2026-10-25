@@ -1,5 +1,9 @@
 # expo-incoming-call 📞
 
+<p align="center">
+  <img src="banner.jpg" alt="expo-incoming-call banner" width="100%" />
+</p>
+
 **Full-screen incoming call UI and lock screen takeover for Expo (React Native) apps on Android.**
 
 Provides a native, WhatsApp-style incoming call experience that wakes the physical screen from sleep, displays directly over the lockscreen without requiring a PIN or password, plays looping ringtone audio, and provides Accept & Decline buttons — even when the app is killed in the background.
