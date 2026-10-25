@@ -6,7 +6,7 @@
   "types": "build/index.d.ts",
   "scripts": {
     "build": "tsc -p .",
-    "clean": "rimraf build",
+    "clean": "node -e \"try { fs.rmSync('build', { recursive: true, force: true }); } catch (e) {}\"",
     "prepublishOnly": "npm run clean && npm run build"
   },
   "keywords": [
